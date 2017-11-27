@@ -1,5 +1,4 @@
-//consumption = 100; //kwh/day
-
+'use strict';
 
 /**
  * @return {number}
@@ -14,6 +13,10 @@ function capita() {
 
 function peta(x) {
     return Math.pow(10, 15) * x;
+}
+
+function giga(x) {
+    return Math.pow(10, 9) * x;
 }
 
 function joule(x) {
@@ -38,11 +41,7 @@ function day(x) {
 
 
 function year(x) {
-    return day(365);
-}
-
-function offshore(area) {
-    return square_meter(area) * watt(3) / square_meter(1)
+    return x * day(365);
 }
 
 function to_kwhpd(x) {
@@ -50,7 +49,7 @@ function to_kwhpd(x) {
 }
 
 
-consumers = {// https://ens.dk/sites/ens.dk/files/Statistik/energistatistik2015.pdf
+let consumers = {// https://ens.dk/sites/ens.dk/files/Statistik/energistatistik2015.pdf
     'energy': PJpYA(42),
     //'lubrication': PJpYA(11),
     'transport': PJpYA(212),
@@ -59,7 +58,7 @@ consumers = {// https://ens.dk/sites/ens.dk/files/Statistik/energistatistik2015.
     'residential': PJpYA(218)
 };
 
-producers = {
+let producers = {
     //'oil': PJpYA(280),
     //'gas': PJpYA(133),
     //'coal': PJpYA(111),
@@ -68,7 +67,7 @@ producers = {
 };
 
 
-function update() {
+function render_meters() {
     $('.consumer').remove();
     $.each(consumers, function (key, value) {
         value = to_kwhpd(value);
@@ -82,33 +81,63 @@ function update() {
     });
 }
 
+function offshore() {
+    this.name = 'offshore';
+    this.drawingOptions = {
+        drawingMode: google.maps.drawing.OverlayType.POLYGON
+    };
+    this.wattpersquaremeter = watt(3) / square_meter(1);
+    this.power = function (event) {
+        const area = google.maps.geometry.spherical.computeArea(event.overlay.getPath());
+        return square_meter(area) * this.wattpersquaremeter;
+    };
+    return this;
+}
+
+function nuclear() {
+    this.name = 'nuclear';
+    this.powerperplant = giga(watt(1.5));
+    this.drawingOptions = {
+        drawingMode: google.maps.drawing.OverlayType.MARKER,
+        markerOptions: {icon: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/Industry-Nuclear-Power-Plant-icon.png'},
+    };
+    this.power = function (event) {
+        return this.powerperplant;
+    };
+    return this;
+}
+
 
 function initMap() {
-    var i = 1;
-    var map = new google.maps.Map(document.getElementById('map'), {
+    let adding = null;
+    let i = 1;
+    const map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 56.1488816, lng: 11.0586993},
-        zoom: 7
+        zoom: 6
     });
-    var drawingManager = new google.maps.drawing.DrawingManager({
+    const drawingManager = new google.maps.drawing.DrawingManager({
         drawingMode: null,
         drawingControl: false
     });
     drawingManager.setMap(map);
 
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
-        var area = google.maps.geometry.spherical.computeArea(polygon.getPath());
-        producers["offshore" + i] = offshore(area);
-        update();
+    google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+        producers[adding.name + i] = adding.power(event);
         drawingManager.setOptions({drawingMode: null});
+        render_meters();
         i++;
     });
 
-    $('#add-offshore').click(function () {
-        drawingManager.setOptions({
-            drawingMode: google.maps.drawing.OverlayType.POLYGON
-        });
-    });
+
+    function add(producer) {
+        return function () {
+            adding = producer;
+            drawingManager.setOptions(producer.drawingOptions);
+        }
+    }
+
+    $('#add-offshore').click(add(new offshore()));
+    $('#add-nuclear').click(add(new nuclear()));
 }
 
-update();
-
+render_meters();

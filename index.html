@@ -21,7 +21,15 @@
         </div>
         <div id="actions" class="col-2">
             <h3>Actions</h3>
-            <button id="add-offshore" type="button" class="btn btn-primary">Add offshore</button>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Add
+              </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a id="add-offshore" class="dropdown-item" href="#">Offshore wind</a>
+                    <a id="add-nuclear" class="dropdown-item" href="#">Nuclear plant</a>
+                </div>
+            </div>
         </div>
         <div class="col-6">
             <h3>Map</h3>
@@ -32,5 +40,8 @@
 
 </body>
 <script type="text/javascript" src="index.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOmNpwyg0kqKHxwyDmBd8Lj5z6rt3ei5M&libraries=drawing&callback=initMap" async defer></script>
 </html>
