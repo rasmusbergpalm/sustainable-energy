@@ -96,6 +96,7 @@ function initMap() {
             position: google.maps.ControlPosition.TOP_CENTER,
             drawingModes: ['polygon']
         }
+
         //markerOptions: {icon: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/Industry-Nuclear-Power-Plant-icon.png'},
     });
     drawingManager.setMap(map);
