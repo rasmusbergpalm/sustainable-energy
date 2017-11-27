@@ -90,14 +90,8 @@ function initMap() {
         zoom: 7
     });
     var drawingManager = new google.maps.drawing.DrawingManager({
-        drawingMode: google.maps.drawing.OverlayType.MARKER,
-        drawingControl: true,
-        drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: ['polygon']
-        }
-
-        //markerOptions: {icon: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/Industry-Nuclear-Power-Plant-icon.png'},
+        drawingMode: null,
+        drawingControl: false
     });
     drawingManager.setMap(map);
 
@@ -105,8 +99,16 @@ function initMap() {
         var area = google.maps.geometry.spherical.computeArea(polygon.getPath());
         producers["offshore" + i] = offshore(area);
         update();
+        drawingManager.setOptions({drawingMode: null});
         i++;
+    });
+
+    $('#add-offshore').click(function () {
+        drawingManager.setOptions({
+            drawingMode: google.maps.drawing.OverlayType.POLYGON
+        });
     });
 }
 
 update();
+
