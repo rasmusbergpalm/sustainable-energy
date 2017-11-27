@@ -1,0 +1,15 @@
+.consumer {
+    border: 1px solid darkred;
+    text-align: center;
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.producer {
+    border: 1px solid darkgreen;
+    text-align: center;
+    background-color: rgba(0, 255, 0, 0.5)
+}
+
+#map {
+    height: 100%;
+}
