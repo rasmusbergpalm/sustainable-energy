@@ -11,29 +11,35 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-        <div id="consumers" class="col-2">
-            <h3>Consumers</h3>
-        </div>
-        <div id="producers" class="col-2">
-            <h3>Producers</h3>
-        </div>
         <div id="actions" class="col-2">
             <h3>Actions</h3>
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Add
-              </button>
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Add
+                </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a id="add-offshore" class="dropdown-item" href="#">Offshore wind</a>
+                    <a id="add-solar" class="dropdown-item" href="#">Solar PV plant</a>
                     <a id="add-nuclear" class="dropdown-item" href="#">Nuclear plant</a>
                 </div>
             </div>
         </div>
         <div class="col-6">
-            <h3>Map</h3>
             <div id="map"></div>
+            <div id="mapAlert" style="display: none;" class="alert alert-primary alert-dismissible fade show" role="alert">
+                Place on the map.
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div id="consumers" class="col-2">
+            <h3>Consumers</h3>
+        </div>
+        <div id="producers" class="col-2">
+            <h3>Producers</h3>
         </div>
     </div>
 </div>

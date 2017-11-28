@@ -3,7 +3,7 @@
 /**
  * @return {number}
  */
-function PJpYA(x) {
+function PJpY(x) {
     return peta(joule(x)) / year(1);
 }
 
@@ -50,20 +50,20 @@ function to_kwhpd(x) {
 
 
 let consumers = {// https://ens.dk/sites/ens.dk/files/Statistik/energistatistik2015.pdf
-    'energy': PJpYA(42),
-    //'lubrication': PJpYA(11),
-    'transport': PJpYA(212),
-    'industry': PJpYA(161),
-    'commerce': PJpYA(112),
-    'residential': PJpYA(218)
+    'energy': PJpY(42),
+    //'lubrication': PJpY(11),
+    'transport': PJpY(212),
+    'industry': PJpY(161),
+    'commerce': PJpY(112),
+    'residential': PJpY(218)
 };
 
 let producers = {
-    //'oil': PJpYA(280),
-    //'gas': PJpYA(133),
-    //'coal': PJpYA(111),
-    //'garbage': PJpYA(18),
-    'current sustainable': PJpYA(213 + 18) //renewables plus garbage
+    //'oil': PJpY(280),
+    //'gas': PJpY(133),
+    //'coal': PJpY(111),
+    //'garbage': PJpY(18),
+    'current sustainable': PJpY(213 + 18) //renewables plus garbage
 };
 
 
@@ -81,22 +81,24 @@ function render_meters() {
     });
 }
 
-function offshore() {
+function Offshore() {
     this.name = 'offshore';
     this.drawingOptions = {
-        drawingMode: google.maps.drawing.OverlayType.POLYGON
+        drawingMode: google.maps.drawing.OverlayType.POLYGON,
+        polygonOptions: {
+            fillColor: 'darkblue'
+        }
     };
     this.wattpersquaremeter = watt(3) / square_meter(1);
     this.power = function (event) {
         const area = google.maps.geometry.spherical.computeArea(event.overlay.getPath());
         return square_meter(area) * this.wattpersquaremeter;
     };
-    return this;
 }
 
-function nuclear() {
+function Nuclear() {
     this.name = 'nuclear';
-    this.powerperplant = giga(watt(1.5));
+    this.powerperplant = giga(watt(1.5));  // Roughly what the newest french plants gives
     this.drawingOptions = {
         drawingMode: google.maps.drawing.OverlayType.MARKER,
         markerOptions: {icon: 'http://icons.iconarchive.com/icons/icons8/windows-8/24/Industry-Nuclear-Power-Plant-icon.png'},
@@ -104,7 +106,21 @@ function nuclear() {
     this.power = function (event) {
         return this.powerperplant;
     };
-    return this;
+}
+
+function Solar() {
+    this.name = 'solar';
+    this.wattpersquaremeter = watt(10) / square_meter(1); //Lerchenborg Gods gives ~ 9 (https://ing.dk/artikel/skandinaviens-stoerste-solcellepark-paa-61-mw-aabnet-ved-kalundborg-181224)
+    this.drawingOptions = {
+        drawingMode: google.maps.drawing.OverlayType.POLYGON,
+        polygonOptions: {
+            fillColor: 'yellow'
+        }
+    };
+    this.power = function (event) {
+        const area = google.maps.geometry.spherical.computeArea(event.overlay.getPath());
+        return square_meter(area) * this.wattpersquaremeter;
+    };
 }
 
 
@@ -112,8 +128,8 @@ function initMap() {
     let adding = null;
     let i = 1;
     const map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 56.1488816, lng: 11.0586993},
-        zoom: 6
+        center: {lat: 56.1488816, lng: 10.5586993},
+        zoom: 7
     });
     const drawingManager = new google.maps.drawing.DrawingManager({
         drawingMode: null,
@@ -122,8 +138,8 @@ function initMap() {
     drawingManager.setMap(map);
 
     google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+        hideMapAlert();
         producers[adding.name + i] = adding.power(event);
-        drawingManager.setOptions({drawingMode: null});
         render_meters();
         i++;
     });
@@ -133,11 +149,21 @@ function initMap() {
         return function () {
             adding = producer;
             drawingManager.setOptions(producer.drawingOptions);
+            $('#mapAlert').show();
         }
     }
 
-    $('#add-offshore').click(add(new offshore()));
-    $('#add-nuclear').click(add(new nuclear()));
+    $('#add-offshore').click(add(new Offshore()));
+    $('#add-nuclear').click(add(new Nuclear()));
+    $('#add-solar').click(add(new Solar()));
+
+    function hideMapAlert() {
+        $('#mapAlert').hide();
+        drawingManager.setOptions({drawingMode: null});
+    }
+
+    $('#mapAlert').find('.close').click(hideMapAlert);
 }
 
 render_meters();
+
